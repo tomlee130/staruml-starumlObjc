@@ -1,0 +1,18 @@
+{
+    "name": "staruml.objc",
+    "title": "Objective-C",
+    "description": "Objective-C code generation engineering.",
+    "homepage": "https://github.com/tomlee130/staruml-starumlObjc",
+    "issues": "https://github.com/tomlee130/staruml-starumlObjc/issues",
+    "keywords": ["Objective-C","ObjC","staruml extention"],
+    "version": "0.9.3",
+    "author": {
+        "name": "Tom Lee",
+        "email": "tomlee130@qq.com",
+        "url": "https://github.com/tomlee130"
+    },
+    "license": "MIT",
+    "engines": {
+        "staruml": ">=2.8.0"
+    }
+}
