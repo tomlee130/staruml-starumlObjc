@@ -710,7 +710,12 @@ define(function (require, exports, module) {
                         str += keywordSignatures;
                         continue;
                     }
-                    str += pvalue + keywordSignatures;
+                    if (elem.stereotype != undefined && elem.stereotype.length > 0) {
+                    	str += elem.stereotype + keywordSignatures;
+                    }
+                    else {
+                    	str += pvalue + keywordSignatures;
+                    }
                 }
                 
                 return str.replace(/(^\s*)|(\s*$)/g, '');
