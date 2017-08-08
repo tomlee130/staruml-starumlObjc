@@ -714,7 +714,7 @@ define(function (require, exports, module) {
                     	str += elem.stereotype + keywordSignatures;
                     }
                     else {
-                    	str += pvalue + keywordSignatures;
+                    	str += "testtest" + keywordSignatures;
                     }
                 }
                 
