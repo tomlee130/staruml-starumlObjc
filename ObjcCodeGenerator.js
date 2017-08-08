@@ -685,6 +685,7 @@ define(function (require, exports, module) {
                 var inputParam = inputParams[i];
                 inputParamStrings.push(this.getType(inputParam) ? this.getType(inputParam) : '');
                 inputParamStrings.push(inputParam.name ? inputParam.name : '');
+                inputParamStrings.push(inputParam.stereotype ? inputParam.stereotype : '');
                 docs += "\n@param " + inputParam.name + ' ' + ((inputParam.documentation) ? inputParam.documentation : '');
             }
             if (returnTypeParam.length > 0) {
@@ -705,17 +706,14 @@ define(function (require, exports, module) {
                 for (i = 0; i < params.length; i = i + 2) {
                     var ptype = params[i];
                     var pvalue = params[i + 1];
+                    var pstereotype = params[i + 2];
                     var keywordSignatures = ':' + '(' + ptype + ')' + pvalue + ' ';
                     if (i === 0) {
                         str += keywordSignatures;
                         continue;
                     }
-                    if (elem.stereotype && elem.stereotype.length > 0) {
-                    	str += elem.stereotype + keywordSignatures;
-                    }
-                    else {
-                    	str += "testtest" + keywordSignatures;
-                    }
+                    
+                    str += (pstereotype && pstereotype.length > 0) ? pstereotype : pvalue + keywordSignatures;
                 }
                 
                 return str.replace(/(^\s*)|(\s*$)/g, '');
