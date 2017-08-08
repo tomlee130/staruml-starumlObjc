@@ -710,7 +710,7 @@ define(function (require, exports, module) {
                         str += keywordSignatures;
                         continue;
                     }
-                    if (elem.stereotype != undefined && elem.stereotype.length > 0) {
+                    if (elem.stereotype && elem.stereotype.length > 0) {
                     	str += elem.stereotype + keywordSignatures;
                     }
                     else {
