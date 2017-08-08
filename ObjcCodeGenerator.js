@@ -713,7 +713,7 @@ define(function (require, exports, module) {
                         continue;
                     }
                     
-                    str += (pstereotype && pstereotype.length > 0) ? pstereotype : pvalue + keywordSignatures;
+                    str += (pstereotype && pstereotype.length > 0) ? pstereotype + keywordSignatures : pvalue + keywordSignatures;
                 }
                 
                 return str.replace(/(^\s*)|(\s*$)/g, '');
