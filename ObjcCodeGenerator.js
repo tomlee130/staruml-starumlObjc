@@ -703,7 +703,7 @@ define(function (require, exports, module) {
                     });
                 };
                 var str = "";
-                for (i = 0; i < params.length; i = i + 2) {
+                for (i = 0; i < params.length; i = i + 3) {
                     var ptype = params[i];
                     var pvalue = params[i + 1];
                     var pstereotype = params[i + 2];
