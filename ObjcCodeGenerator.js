@@ -642,7 +642,12 @@ define(function (require, exports, module) {
             
             if (_type.indexOf('*') === -1) {
                 property += "assign) ";
-            } else {
+            }
+            else if (_type.indexOf('NSString') != -1 || _type.indexOf('^') != -1) {
+            // NSString & block need 'copy' keyword
+            		property += "copy) ";
+            }
+            else {
                 property += "strong) ";
             }
             
