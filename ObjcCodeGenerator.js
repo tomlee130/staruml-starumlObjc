@@ -248,6 +248,9 @@ define(function (require, exports, module) {
             }
             var docs = '@brief  ' + brief + '\n\n@author: uml \n\n@version: ' + year + '年' + month + '月' + day + '日 ' + hour + ':' + minute + ':' + second + '\n';
             codeWriter.writeLine(cppCodeGen.getDocuments(docs));
+            
+            elem.name = elem.name.replace("\*","").replace(" ","");
+            
             if (elem instanceof type.UMLInterface) {
                 codeWriter.writeLine("@protocol " + elem.name + " <NSObject>");
             } else if ( elem instanceof type.UMLClass &&  elem.ownedElements.length > 0){
