@@ -249,19 +249,19 @@ define(function (require, exports, module) {
             var docs = '@brief  ' + brief + '\n\n@author: uml \n\n@version: ' + year + '年' + month + '月' + day + '日 ' + hour + ':' + minute + ':' + second + '\n';
             codeWriter.writeLine(cppCodeGen.getDocuments(docs));
             
-            elem.name = elem.name.replace("\*","").replace(" ","");
+            var mainName = elem.name.replace("\*","").replace(" ","");
             
             if (elem instanceof type.UMLInterface) {
-                codeWriter.writeLine("@protocol " + elem.name + " <NSObject>");
+                codeWriter.writeLine("@protocol " + mainName + " <NSObject>");
             } else if ( elem instanceof type.UMLClass &&  elem.ownedElements.length > 0){
                 var genList = cppCodeGen.getSuperClasses(elem);
                 if (elem.ownedElements[0] instanceof type.UMLInterfaceRealization && !tmpIsPrivate) {
-                    codeWriter.writeLine("@interface " + elem.name + ": NSObject "+ writeProtocol(elem, tmpIsPrivate));
+                    codeWriter.writeLine("@interface " + mainName + ": NSObject "+ writeProtocol(elem, tmpIsPrivate));
                 } else {
-                    codeWriter.writeLine("@interface " + elem.name + finalModifier + writeInheritance(elem, tmpIsPrivate));
+                    codeWriter.writeLine("@interface " + mainName + finalModifier + writeInheritance(elem, tmpIsPrivate));
                 }
             } else {
-                codeWriter.writeLine("@interface " + elem.name + finalModifier + writeInheritance(elem, tmpIsPrivate));
+                codeWriter.writeLine("@interface " + mainName + finalModifier + writeInheritance(elem, tmpIsPrivate));
             }
             
             if (classfiedAttributes._public.length > 0 && !tmpIsPrivate) {
@@ -335,7 +335,7 @@ define(function (require, exports, module) {
             }
             
             // General @implementation 
-            codeWriter.writeLine('@implementation ' + elem.name + '\n\n');
+            codeWriter.writeLine('@implementation ' + mainName + '\n\n');
             
             
             // General methods
