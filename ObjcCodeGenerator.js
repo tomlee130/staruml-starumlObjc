@@ -102,12 +102,7 @@ define(function (require, exports, module) {
         this.genOptions = options;
 
         var getFilePath = function (extenstions) {
-        		var fileName = elem.name;
-        		if (fileName.indexOf("*") != -1) {
-            	fileName = fileName.replace(" ", "").replace("\*","");
-            }
-        
-            var abs_path = path + "/" + fileName + ".";
+            var abs_path = path + "/" + elem.name.replace(" ", "").replace("\*","") + ".";
             
             if (extenstions === _CPP_CODE_GEN_H) {
                 abs_path += _CPP_CODE_GEN_H;
