@@ -335,7 +335,7 @@ define(function (require, exports, module) {
             }
             
             // General @implementation 
-            codeWriter.writeLine('@implementation ' + mainName + '\n\n');
+            codeWriter.writeLine('@implementation ' + elem.name.replace("\*","").replace(" ","") + '\n\n');
             
             
             // General methods
