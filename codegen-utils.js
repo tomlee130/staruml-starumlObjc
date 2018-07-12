@@ -72,3 +72,4 @@ CodeWriter.prototype.getData = function () {
 };
 
 exports.CodeWriter = CodeWriter;
+
