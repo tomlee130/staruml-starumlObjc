@@ -71,7 +71,7 @@ function _handleGenerate(base, path, options) {
                         codeGenerator.generate(base, path, options)
                     }
                 } else {
-                    codeGenerator.generate(base, path, options)
+                    app.dialogs.showErrorDialog('Failed to generate codes.')
                 }
             }
         })
@@ -84,7 +84,7 @@ function _handleGenerate(base, path, options) {
                 codeGenerator.generate(base, path, options)
             }
         } else {
-            codeGenerator.generate(base, path, options)
+            app.dialogs.showErrorDialog('Failed to generate codes.')
         }
     }
 }

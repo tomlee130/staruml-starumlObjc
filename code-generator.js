@@ -33,7 +33,7 @@ const path = require('path')
 const fs = require('fs')
 const codegen = require('./codegen-utils')
 
-var copyrightHeader = "/* Test header @ toori67 \n * This is Test\n * also test\n * also test again\n */";
+var copyrightHeader = "";
 var versionString = "v0.0.1";
 
 /**
@@ -54,17 +54,31 @@ class CppCodeGenerator {
         /** @member {string} */
         this.basePath = basePath
 
-        var doc = ''
-        if (app.project.getProject().name && app.project.getProject().name.length > 0) {
-            doc += '\nProject ' + app.project.getProject().name
+        let doc = '//'
+
+        doc += '\n//  %FILENAME%'
+
+        let projectName = app.project.getProject().name
+        if (!projectName || projectName.length == 0) {
+            projectName = 'Project Name'
         }
-        if (app.project.getProject().author && app.project.getProject().author.length > 0) {
-            doc += '\n@author ' + app.project.getProject().author
+        doc += '\n//  ' + app.project.getProject().name
+
+        doc += '\n//'
+
+        let author = app.project.getProject().author
+        if (!author || author.length == 0) {
+            author = 'StarUML'
         }
-        if (app.project.getProject().version && app.project.getProject().version.length > 0) {
-            doc += '\n@version ' + app.project.getProject().version
+        let [date, time] = new Date().toLocaleString('zh-Hans-CN', {hour12: false}).split(', ')
+        doc += '\n//  Created by ' + author + " on " + date
+
+        let copyright = app.project.getProject().copyright
+        if (!copyright || copyright.length == 0) {
+            copyright = ''
         }
-        copyrightHeader = this.getDocuments(doc)
+        doc += '\n//  Copyright © '+ copyright +'. All rights reserved. \n//\n'
+        copyrightHeader = doc
     }
 
     /**
@@ -98,6 +112,8 @@ class CppCodeGenerator {
             return absPath
         }
 
+        var indentString = this.getIndentString(options)
+
         var writeEnumeration = function (codeWriter, elem, cppCodeGen) {
             var i;
             var modifierList = cppCodeGen.getModifiers(elem);
@@ -117,7 +133,7 @@ class CppCodeGenerator {
             }
 
             codeWriter.writeLine(modifierStr + 'typedef NS_ENUM(NSInteger, ' + elem.name +
-                ') {\n' + elem.literals.map(lit => lit.name).join(',\t\n') + '\n};')
+                ') {\n' + elem.literals.map(lit => indentString + lit.name).join(',\t\n') + '\n};')
         }
 
         var date = new Date();
@@ -133,8 +149,12 @@ class CppCodeGenerator {
             var tmpIsPrivate = isPrivate ? isPrivate : false;
             var write = function (items) {
                 var i;
+
+                // TODO: put Enumeration on top
+
                 for (i = 0; i < items.length; i++) {
                     var item = items[i];
+
                     if (item instanceof type.UMLAttribute ||  item instanceof type.UMLAssociationEnd) { // if write member variable
                         codeWriter.writeLine(cppCodeGen.getMemberVariable(item));
                     } else if (item instanceof type.UMLEnumeration) {
@@ -235,14 +255,17 @@ class CppCodeGenerator {
             if (templatePart.length > 0) {
                 codeWriter.writeLine(templatePart);
             }
-            var brief = elem.name + ' Interface';
+
+            let mainName = elem.name.replace("\*","").replace(" ","");
+
+            var brief = mainName + ' Interface';
             if (elem.documentation.length > 0) {
                 brief = elem.documentation;
             }
-            var docs = brief + '\n\n@author: '+ app.project.getProject().author +' \n\n@version: ' + year + '年' + month + '月' + day + '日 ' + hour + ':' + minute + ':' + second + '\n';
-            codeWriter.writeLine(cppCodeGen.getDocuments(docs));
 
-            var mainName = elem.name.replace("\*","").replace(" ","");
+            let [date, time] = new Date().toLocaleString('zh-Hans-CN', {hour12: false}).split(', ')
+            var docs = brief + '\n\n@author: '+ app.project.getProject().author +' \n@version: 1.0\n@date: ' + date + '\n';
+            codeWriter.writeLine(cppCodeGen.getDocuments(docs));
 
             if (elem instanceof type.UMLInterface) {
                 codeWriter.writeLine("@protocol " + mainName + " <NSObject>");
@@ -253,6 +276,7 @@ class CppCodeGenerator {
                 } else {
                     codeWriter.writeLine("@interface " + mainName + finalModifier + writeInheritance(elem, tmpIsPrivate));
                 }
+                codeWriter.writeLine()
             } else {
                 codeWriter.writeLine("@interface " + mainName + finalModifier + writeInheritance(elem, tmpIsPrivate));
             }
@@ -381,6 +405,17 @@ class CppCodeGenerator {
         // Package -> as namespace or not
         if (elem instanceof type.UMLPackage) {
             fullPath = path.join(basePath, elem.name)
+
+            if (fs.existsSync(fullPath)) {
+                let buttonId = app.dialogs.showConfirmDialog("Same package has existed, did you want to remove it?")
+                if (buttonId == 'ok') {
+                    deleteFolderRecursive(fullPath)
+                }
+                else {
+                    return
+                }
+            }
+
             fs.mkdirSync(fullPath)
             if (Array.isArray(elem.ownedElements)) {
                 elem.ownedElements.forEach(child => {
@@ -424,10 +459,9 @@ class CppCodeGenerator {
      * @return {Object} string
      */
     writeHeaderSkeletonCode (elem, options, funct) {
-        var headerString = "_" + elem.name.toUpperCase() + "_H";
-        var codeWriter = new codegen.CodeWriter(this.getIndentString(options))
-        var includePart = this.getIncludePart(elem);
-        codeWriter.writeLine(copyrightHeader);
+        let codeWriter = new codegen.CodeWriter(this.getIndentString(options))
+        let includePart = this.getIncludePart(elem);
+        codeWriter.writeLine(this.fillCopyrightFileName(elem.name.replace(/\s\*/, '') + '.' + _CPP_CODE_GEN_H));
         codeWriter.writeLine();
 
         if (includePart.length > 0) {
@@ -436,7 +470,15 @@ class CppCodeGenerator {
         }
 
         codeWriter.writeLine();
-        codeWriter.writeLine("#import <Foundation/Foundation.h>\n");
+
+        // if file name contain View, add UIKit
+        if (elem.name.indexOf('View') != -1) {
+            codeWriter.writeLine("#import <Foundation/Foundation.h>");
+            codeWriter.writeLine("#import <UIKit/UIKit.h>\n");
+        }
+        else {
+            codeWriter.writeLine("#import <Foundation/Foundation.h>\n");
+        }
 
         funct(codeWriter, elem, this);
 
@@ -454,7 +496,7 @@ class CppCodeGenerator {
      */
     writeBodySkeletonCode (elem, options, funct) {
         var codeWriter = new codegen.CodeWriter(this.getIndentString(options))
-        codeWriter.writeLine(copyrightHeader);
+        codeWriter.writeLine(this.fillCopyrightFileName(elem.name.replace(/\s\*/, '')  + '.' + _CPP_CODE_GEN_CPP));
         codeWriter.writeLine();
         codeWriter.writeLine("#import \"" +  elem.name.replace(/\s\*/, '') + ".h\"");
         codeWriter.writeLine();
@@ -535,7 +577,11 @@ class CppCodeGenerator {
             }
             header += targetString;
 
-            return header;
+            // objc use last part
+            let parts = header.split('/');
+            let lastPart = parts[parts.length - 1]
+
+            return lastPart;
         };
 
 
@@ -619,13 +665,17 @@ class CppCodeGenerator {
      */
     getMemberVariable (elem) {
         if (elem.name.length > 0) {
-            var terms = [];
+            let terms = [];
             // doc
-            var doc = '@brief  ' + (elem.documentation ? elem.documentation : elem.name);
-            var docs = this.getDocuments(doc);
-            var property = "@property (nonatomic, ";
+            let doc = '';
+
+            if (elem.documentation.length > 0) {
+                doc = '\t///< ' + elem.documentation.replace(/\n/g, '; ');
+            }
+
+            let property = "@property (nonatomic, ";
             // type
-            var _type = this.getType(elem);
+            let _type = this.getType(elem);
 
             if (_type.indexOf('*') === -1) {
                 property += "assign) ";
@@ -638,13 +688,18 @@ class CppCodeGenerator {
                 property += "strong) ";
             }
 
-            if (elem.type instanceof type.UMLInterface) {
+            if (elem.type instanceof type.UMLInterface && elem.multiplicity.length == 0) {
                 _type = "id<" + _type + ">";
             }
 
-            property += _type + " " + elem.name + ";";
+            let space = " "
+            if (_type.charAt(_type.length - 1) == "*") {
+                // If last char is '*'
+                space = ""  // remove space before param name
+            }
+            property += _type + space + elem.name + ";";
 
-            return (docs + property);
+            return property + doc;
         }
     }
 
@@ -657,7 +712,7 @@ class CppCodeGenerator {
      */
     getMethod (elem, isCppBody) {
         if (elem.name.length > 0) {
-            var docs = "@brief " + (elem.documentation ? elem.documentation : elem.name);
+            var docs = elem.documentation ? elem.documentation : elem.name;
             var i;
             var methodStr = "- ";
             var isVirtaul = false;
@@ -760,8 +815,13 @@ class CppCodeGenerator {
                 methodStr += ";";
             }
 
-
-            return "\n" + this.getDocuments(docs) + methodStr;
+            if (elem.documentation.length == 0) {
+                // no comment
+                return "\n" + methodStr;
+            }
+            else {
+                return "\n" + this.getDocuments(docs) + '\n' + methodStr;
+            }
         }
     }
 
@@ -780,7 +840,7 @@ class CppCodeGenerator {
             for (i = 0; i < lines.length; i++) {
                 docs += " * " + lines[i] + "\n";
             }
-            docs += " */\n";
+            docs += " */";
         }
         return docs;
     }
@@ -849,7 +909,7 @@ class CppCodeGenerator {
 
         // multiplicity
         if (elem.multiplicity) {
-            _type += "NSArray<" + _type + "> *";
+            _type = "NSArray<" + _type + "> *"
         }
         return this.renameType(_type);
     }
@@ -884,11 +944,29 @@ class CppCodeGenerator {
             case "byte":
                 return "Byte";
             case "Object":
-                return "NSObject *";
+                return "id";
         }
         return type;
     }
+
+    fillCopyrightFileName (fileName) {
+        return copyrightHeader.replace(/%FILENAME%/g, fileName)
+    }
 }
+
+var deleteFolderRecursive = function(path) {
+    if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file,index){
+            var curPath = path + "/" + file;
+            if(fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+};
 
 function generate(baseModel, basePath, options) {
     var cppCodeGenerator = new CppCodeGenerator(baseModel, basePath)
