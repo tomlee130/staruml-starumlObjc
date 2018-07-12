@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 MKLab. All rights reserved.
+ * Copyright (c) 2014-2018 MKLab. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,153 +21,102 @@
  *
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50, regexp: true */
-/*global define, $, _, window, app, type, appshell, document */
 
-define(function (require, exports, module) {
-    "use strict";
+const codeGenerator = require('./code-generator')
+const codeAnalyzer = require('./code-analyzer')
 
-    var AppInit             = app.getModule("utils/AppInit"),
-        Repository          = app.getModule("core/Repository"),
-        Engine              = app.getModule("engine/Engine"),
-        Commands            = app.getModule("command/Commands"),
-        CommandManager      = app.getModule("command/CommandManager"),
-        MenuManager         = app.getModule("menu/MenuManager"),
-        Dialogs             = app.getModule("dialogs/Dialogs"),
-        ElementPickerDialog = app.getModule("dialogs/ElementPickerDialog"),
-        FileSystem          = app.getModule("filesystem/FileSystem"),
-        FileSystemError     = app.getModule("filesystem/FileSystemError"),
-        ExtensionUtils      = app.getModule("utils/ExtensionUtils"),
-        UML                 = app.getModule("uml/UML");
-
-    var CodeGenUtils        = require("CodeGenUtils"),
-        ObjcPreferences     = require("ObjcPreferences"),
-        ObjcCodeGenerator   = require("ObjcCodeGenerator"),
-        ObjcReverseEngineer = require("ObjcReverseEngineer");
-
-    /**
-     * Commands IDs
-     */
-    var CMD_OBJC           = 'Objective-C',
-        CMD_OBJC_GENERATE  = 'ObjC.generate',
-        CMD_OBJC_REVERSE   = 'ObjC.reverse',
-        CMD_OBJC_CONFIGURE = 'ObjC.configure';
-
-    /**
-     * Command Handler for Objective-C Generate
-     *
-     * @param {Element} base
-     * @param {string} path
-     * @param {Object} options
-     * @return {$.Promise}
-     */
-    function _handleGenerate(base, path, options) {
-        var result = new $.Deferred();
-
-        // If options is not passed, get from preference
-        options = options || ObjcPreferences.getGenOptions();
-
-        // If base is not assigned, popup ElementPicker
-        if (!base) {
-            ElementPickerDialog.showDialog("Select a base model to generate codes", null, type.UMLPackage)
-                .done(function (buttonId, selected) {
-                    if (buttonId === Dialogs.DIALOG_BTN_OK && selected) {
-                        base = selected;
-
-                        // If path is not assigned, popup Open Dialog to select a folder
-                        if (!path) {
-                            FileSystem.showOpenDialog(false, true, "Select a folder where generated codes to be located", null, null, function (err, files) {
-                                if (!err) {
-                                    if (files.length > 0) {
-                                        path = files[0];
-                                        ObjcCodeGenerator.generate(base, path, options).then(result.resolve, result.reject);
-                                    } else {
-                                        result.reject(FileSystem.USER_CANCELED);
-                                    }
-                                } else {
-                                    result.reject(err);
-                                }
-                            });
-                        } else {
-                            ObjcCodeGenerator.generate(base, path, options).then(result.resolve, result.reject);
-                        }
-                    } else {
-                        result.reject();
-                    }
-                });
-        } else {
-            // If path is not assigned, popup Open Dialog to select a folder
-            if (!path) {
-                FileSystem.showOpenDialog(false, true, "Select a folder where generated codes to be located", null, null, function (err, files) {
-                    if (!err) {
-                        if (files.length > 0) {
-                            path = files[0];
-                            ObjcCodeGenerator.generate(base, path, options).then(result.resolve, result.reject);
-                        } else {
-                            result.reject(FileSystem.USER_CANCELED);
-                        }
-                    } else {
-                        result.reject(err);
-                    }
-                });
-            } else {
-                ObjcCodeGenerator.generate(base, path, options).then(result.resolve, result.reject);
-            }
-        }
-        return result.promise();
+function getGenOptions() {
+    return {
+        javaDoc: app.preferences.get("objc.gen.javaDoc"),
+        useTab: app.preferences.get("objc.gen.useTab"),
+        indentSpaces: app.preferences.get("objc.gen.indentSpaces"),
+        useVector: app.preferences.get("Cpp.gen.useVector"),
+        includeHeader: app.preferences.get("Cpp.gen.includeHeader"),
+        genImpl: app.preferences.get("Cpp.gen.genImpl"),
+        genStrictAbstract: app.preferences.get("Cpp.gen.genStrictAbstract")
     }
+}
 
-    /**
-     * Command Handler for Objective-C Reverse
-     *
-     * @param {string} basePath
-     * @param {Object} options
-     * @return {$.Promise}
-     */
-    function _handleReverse(basePath, options) {
-        var result = new $.Deferred();
+function getRevOptions() {
+    return {
+        association: app.preferences.get("objc.rev.association"),
+        publicOnly: app.preferences.get("objc.rev.publicOnly"),
+        typeHierarchy: app.preferences.get("objc.rev.typeHierarchy"),
+        packageOverview: app.preferences.get("objc.rev.packageOverview"),
+        packageStructure: app.preferences.get("objc.rev.packageStructure")
+    }
+}
 
-        // If options is not passed, get from preference
-        options = ObjcPreferences.getRevOptions();
-
-        // If basePath is not assigned, popup Open Dialog to select a folder
-        if (!basePath) {
-            FileSystem.showOpenDialog(false, true, "Select Folder", null, null, function (err, files) {
-                if (!err) {
-                    if (files.length > 0) {
-                        basePath = files[0];
-                        ObjcReverseEngineer.analyze(basePath, options).then(result.resolve, result.reject);
-                    } else {
-                        result.reject(FileSystem.USER_CANCELED);
+/**
+ * Command Handler for Objective-C Generate
+ *
+ * @param {Element} base
+ * @param {string} path
+ * @param {Object} options
+ * @return {$.Promise}
+ */
+function _handleGenerate(base, path, options) {
+    // If options is not passed, get from preference
+    options = options || getGenOptions()
+    // If base is not assigned, popup ElementPicker
+    if (!base) {
+        app.elementPickerDialog.showDialog('Select a base model to generate codes', null, type.UMLPackage).then(function ({buttonId, returnValue}) {
+            if (buttonId === 'ok') {
+                base = returnValue
+                // If path is not assigned, popup Open Dialog to select a folder
+                if (!path) {
+                    var files = app.dialogs.showOpenDialog('Select a folder where generated codes to be located', null, null, {properties: ['openDirectory']})
+                    if (files && files.length > 0) {
+                        path = files[0]
+                        codeGenerator.generate(base, path, options)
                     }
                 } else {
-                    result.reject(err);
+                    app.dialogs.showErrorDialog('Failed to generate codes.')
                 }
-            });
+            }
+        })
+    } else {
+        // If path is not assigned, popup Open Dialog to select a folder
+        if (!path) {
+            var files = app.dialogs.showOpenDialog('Select a folder where generated codes to be located', null, null, {properties: ['openDirectory']})
+            if (files && files.length > 0) {
+                path = files[0]
+                codeGenerator.generate(base, path, options)
+            }
+        } else {
+            app.dialogs.showErrorDialog('Failed to generate codes.')
         }
-        return result.promise();
     }
+}
 
-
-    /**
-     * Popup PreferenceDialog with Objective-C Preference Schema
-     */
-    function _handleConfigure() {
-        CommandManager.execute(Commands.FILE_PREFERENCES, ObjcPreferences.getId());
+/**
+ * Command Handler for C++ Reverse
+ *
+ * @param {string} basePath
+ * @param {Object} options
+ */
+function _handleReverse(basePath, options) {
+    // If options is not passed, get from preference
+    options = getRevOptions()
+    // If basePath is not assigned, popup Open Dialog to select a folder
+    if (!basePath) {
+        var files = app.dialogs.showOpenDialog('Select Folder', null, null, {properties: ['openDirectory']})
+        if (files && files.length > 0) {
+            basePath = files[0]
+            codeAnalyzer.analyze(basePath, options)
+        }
     }
+}
 
-    // Register Commands
-    CommandManager.register("Objective-C",      CMD_OBJC,           CommandManager.doNothing);
-    CommandManager.register("Generate Code...", CMD_OBJC_GENERATE,  _handleGenerate);
-    CommandManager.register("Reverse Code...",  CMD_OBJC_REVERSE,   _handleReverse);
-    CommandManager.register("Configure...",     CMD_OBJC_CONFIGURE, _handleConfigure);
+function _handleConfigure() {
+    app.commands.execute('application:preferences', 'objc')
+}
 
-    var menu, menuItem;
-    menu = MenuManager.getMenu(Commands.TOOLS);
-    menuItem = menu.addMenuItem(CMD_OBJC);
-    menuItem.addMenuItem(CMD_OBJC_GENERATE);
-//    menuItem.addMenuItem(CMD_OBJC_REVERSE);
-    menuItem.addMenuDivider();
-    menuItem.addMenuItem(CMD_OBJC_CONFIGURE);
+function init() {
+    app.commands.register('objc:generate', _handleGenerate)
+    app.commands.register('objc:reverse', _handleReverse)
+    app.commands.register('objc:configure', _handleConfigure)
+}
 
-});
+exports.init = init
+
