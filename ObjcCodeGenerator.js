@@ -252,7 +252,7 @@ define(function (require, exports, module) {
             if (elem.documentation.length > 0) {
                 brief = elem.documentation;
             }
-            var docs = '@brief  ' + brief + '\n\n@author: uml \n\n@date: ' + year + '-' + month + '-' + day + '日\n';
+            var docs = '@brief  ' + brief + '\n\n@author: uml \n\n@date: ' + year + '-' + month + '-' + day + '\n';
             codeWriter.writeLine(cppCodeGen.getDocuments(docs));
             if (elem instanceof type.UMLInterface) {
                 codeWriter.writeLine("@protocol " + elem.name + " <NSObject>");
