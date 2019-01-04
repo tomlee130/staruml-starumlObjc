@@ -130,7 +130,7 @@ define(function (require, exports, module) {
                 codeWriter.writeLine('/**\n' + " " + elem.documentation + '\n');
 
                 var litLength = elem.literals.length;
-                for (let i = 0; i < litLength; i++) {
+                for (i = 0; i < litLength; i++) {
                     codeWriter.writeLine(' - ' + elem.literals[i].name + ': ' + elem.literals[i].documentation);
                 }
                 codeWriter.writeLine(' */');
