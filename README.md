@@ -14,6 +14,11 @@ This extension for StarUML(http://staruml.io) support to generate Objective-C co
 
 #import <Foundation/Foundation.h>
 
+@HHLabel;
+@HHImageView;
+@HHButton;
+
+
 /**
  * @brief  SDK界面管理
  * 
