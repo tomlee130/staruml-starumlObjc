@@ -125,21 +125,20 @@ define(function (require, exports, module) {
             for (i = 0; i < modifierList.length; i++) {
                 modifierStr += modifierList[i] + " ";
             }
-            
-            if (elem.documentation.length > 0) {
-                codeWriter.writeLine('/**\n' + " " + elem.documentation + '\n')
 
-                const litLength = elem.literals.length
+            if (elem.documentation.length > 0) {
+                codeWriter.writeLine('/**\n' + " " + elem.documentation + '\n');
+
+                var litLength = elem.literals.length;
                 for (let i = 0; i < litLength; i++) {
-                    codeWriter.writeLine(' - ' + elem.literals[i].name + ': ' + elem.literals[i].documentation)
+                    codeWriter.writeLine(' - ' + elem.literals[i].name + ': ' + elem.literals[i].documentation);
                 }
-                codeWriter.writeLine(' */')
+                codeWriter.writeLine(' */');
             }
 
             codeWriter.writeLine(modifierStr + 'typedef NS_ENUM(NSInteger, ' + elem.name +
-                ') {\n' + elem.literals.map(lit => indentString + elem.name + titleCase(lit.name)).join(',\t\n') + '\n};')
+                ') {\n' + elem.literals.map(lit => indentString + elem.name + titleCase(lit.name)).join(',\t\n') + '\n};');
         }
-        };
 
         var date = new Date();
         var year = date.getFullYear();
