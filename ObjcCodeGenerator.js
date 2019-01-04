@@ -581,6 +581,19 @@ define(function (require, exports, module) {
             if (realize.target === elem) {
                 continue;
             }
+
+            if (trackingHeader(elem, realize.target).substring(0,1) === "UI") {
+                continue;
+            }
+
+            if (trackingHeader(elem, realize.target).substring(0,1) === "NS") {
+                continue;
+            }
+
+            if (trackingHeader(elem, realize.target).substring(0,1) === "AB") {
+                continue;
+            }
+
             headerString += "#import \"" + trackingHeader(elem, realize.target) + ".h\"\n";
         }
 
