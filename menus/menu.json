@@ -1,0 +1,19 @@
+{
+  "menu": [
+    {
+      "id": "tools",
+      "submenu": [
+        {
+          "label": "Objective-C",
+          "id": "tools.objc",
+          "submenu": [
+            { "label": "Generate Code...", "id": "tools.objc.generate", "command": "objc:generate" },
+            { "label": "Reverse Code...", "id": "tools.objc.reverse", "command": "objc:reverse" },
+            { "type": "separator" },
+            { "label": "Configure...", "id": "tools.objc.configure", "command": "objc:configure" }
+          ]
+        }
+      ]
+    }
+  ]
+}

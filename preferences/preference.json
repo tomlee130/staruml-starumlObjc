@@ -1,0 +1,86 @@
+{
+  "id": "objc",
+  "name": "ObjectiveC",
+  "schema": {
+    "objc.gen": {
+      "text": "Objective-C Code Generation",
+      "type": "section"
+    },
+    "objc.gen.javaDoc": {
+      "text": "JavaDoc",
+      "description": "Generate JavaDoc comments.",
+      "type": "check",
+      "default": true
+    },
+    "objc.gen.useTab": {
+      "text": "Use Tab",
+      "description": "Use Tab for indentation instead of spaces.",
+      "type": "check",
+      "default": false
+    },
+    "objc.gen.indentSpaces": {
+      "text": "Indent Spaces",
+      "description": "number of spaces for indentation.",
+      "type": "number",
+      "default": 4
+    },
+    "Cpp.gen.includeHeader": {
+      "text": "Include default header",
+      "description": "Include default header.",
+      "type": "check",
+      "default": true
+    },
+    "Cpp.gen.useVector": {
+      "text": "Use vector instead of *",
+      "description": "Use vector<> instead of pointer.",
+      "type": "check",
+      "default": true
+    },
+    "Cpp.gen.genImpl": {
+      "text": "Generate *.m file",
+      "description": "Generate implementation file",
+      "type": "check",
+      "default": true
+    },
+    "Cpp.gen.genStrictAbstract": {
+      "text": "Generate strict Abstract",
+      "description": "Generate  strict Abstract",
+      "type": "check",
+      "default": false
+    },
+    "objc.rev": {
+      "text": "Objective-C Reverse Engineering",
+      "type": "section"
+    },
+    "objc.rev.association": {
+      "text": "Use Association",
+      "description": "Reverse Objective-C Fields as UML Associations.",
+      "type": "check",
+      "default": true
+    },
+    "objc.rev.publicOnly": {
+      "text": "Public Only",
+      "description": "Reverse public members only.",
+      "type": "check",
+      "default": false
+    },
+    "objc.rev.typeHierarchy": {
+      "text": "Type Hierarchy Diagram",
+      "description": "Create a type hierarchy diagram for all classes and interfaces",
+      "type": "check",
+      "default": true
+    },
+    "objc.rev.packageOverview": {
+      "text": "Package Overview Diagram",
+      "description": "Create overview diagram for each package",
+      "type": "check",
+      "default": true
+    },
+    "objc.rev.packageStructure": {
+      "text": "Package Structure Diagram",
+      "description": "Create a package structure diagram for all packages",
+      "type": "check",
+      "default": true
+    }
+  }
+}
