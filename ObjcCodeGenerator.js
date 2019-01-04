@@ -111,6 +111,13 @@ define(function (require, exports, module) {
             return abs_path;
         };
 
+        //数组+map  
+        var titleCase = function (s) {
+            return s.split(/\s+/).map(function(item, index) {  
+                return item.slice(0, 1).toUpperCase() + item.slice(1);  
+            }).join(' ');
+        }  
+
         var writeEnumeration = function (codeWriter, elem, cppCodeGen) {
             var i;
             var modifierList = cppCodeGen.getModifiers(elem);
@@ -118,7 +125,12 @@ define(function (require, exports, module) {
             for (i = 0; i < modifierList.length; i++) {
                 modifierStr += modifierList[i] + " ";
             }
-            codeWriter.writeLine(modifierStr + "enum " + elem.name + " { "  + _.pluck(elem.literals, 'name').join(", ")  + " };");
+            var elems = _.pluck(elem.literals, 'name');
+            var members = ""
+            for (var i = 0; i < elems.length; i++) {
+                members += elem.name + titleCase(elems[i]) + ", \n";
+            }
+            codeWriter.writeLine(modifierStr + "typedef NS_ENUM(NSUInteger, " + elem.name + ") {\n" + members  + " };");
         };
 
         var date = new Date();
