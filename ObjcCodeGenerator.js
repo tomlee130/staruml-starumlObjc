@@ -582,15 +582,15 @@ define(function (require, exports, module) {
                 continue;
             }
 
-            if (trackingHeader(elem, realize.target).substring(0,1) === "UI") {
+            if (trackingHeader(elem, realize.target).substr(0,2) === "UI") {
                 continue;
             }
 
-            if (trackingHeader(elem, realize.target).substring(0,1) === "NS") {
+            if (trackingHeader(elem, realize.target).substr(0,2) === "NS") {
                 continue;
             }
 
-            if (trackingHeader(elem, realize.target).substring(0,1) === "MB") {
+            if (trackingHeader(elem, realize.target).substr(0,2) === "MB") {
                 continue;
             }
 
@@ -611,15 +611,15 @@ define(function (require, exports, module) {
             if (target === elem) {
                 continue;
             }
-            if (trackingHeader(elem, target).substring(0,1) === "UI") {
+            if (trackingHeader(elem, target).substr(0,2) === "UI") {
                 continue;
             }
 
-            if (trackingHeader(elem, target).substring(0,1) === "NS") {
+            if (trackingHeader(elem, target).substr(0,2) === "NS") {
                 continue;
             }
 
-            if (trackingHeader(elem, target).substring(0,1) === "MB") {
+            if (trackingHeader(elem, target).substr(0,2) === "MB") {
                 continue;
             }
             headerString += "#import \"" + trackingHeader(elem, target) + ".h\"\n";
