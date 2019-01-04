@@ -126,9 +126,15 @@ define(function (require, exports, module) {
                 modifierStr += modifierList[i] + " ";
             }
             var elems = _.pluck(elem.literals, 'name');
+            var documentation = _.pluck(elem.literals, 'documentation');
             var members = ""
             for (var i = 0; i < elems.length; i++) {
-                members += "\t" + elem.name + titleCase(elems[i]) + ", /* "+ elem.documentation + " */\n";
+                if (documentation[i].length > 0) {
+                    members += "\t" + elem.name + titleCase(elems[i]) + ", /* "+ documentation[i] + " */\n";
+                    continue;
+                }
+
+                members += "\t" + elem.name + titleCase(elems[i]) + ",\n";
             }
             codeWriter.writeLine(modifierStr + "typedef NS_ENUM(NSUInteger, " + elem.name + ") {\n" + members  + "};");
         };
