@@ -590,7 +590,7 @@ define(function (require, exports, module) {
                 continue;
             }
 
-            if (trackingHeader(elem, realize.target).substr(0,2) === "MB") {
+            if (trackingHeader(elem, realize.target).substr(0,2) === "AB") {
                 continue;
             }
 
@@ -619,7 +619,7 @@ define(function (require, exports, module) {
                 continue;
             }
 
-            if (trackingHeader(elem, target).substr(0,2) === "MB") {
+            if (trackingHeader(elem, target).substr(0,2) === "AB") {
                 continue;
             }
             headerString += "#import \"" + trackingHeader(elem, target) + ".h\"\n";
