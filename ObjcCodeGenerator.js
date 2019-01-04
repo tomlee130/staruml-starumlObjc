@@ -128,9 +128,9 @@ define(function (require, exports, module) {
             var elems = _.pluck(elem.literals, 'name');
             var members = ""
             for (var i = 0; i < elems.length; i++) {
-                members += elem.name + titleCase(elems[i]) + ", \n";
+                members += elem.name + titleCase(elems[i]) + ", \n\t";
             }
-            codeWriter.writeLine(modifierStr + "typedef NS_ENUM(NSUInteger, " + elem.name + ") {\n" + members  + " };");
+            codeWriter.writeLine(modifierStr + "typedef NS_ENUM(NSUInteger, " + elem.name + ") {\n\t" + members  + "};");
         };
 
         var date = new Date();
