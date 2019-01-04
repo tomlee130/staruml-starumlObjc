@@ -1,5 +1,5 @@
 # staruml-starumlObjc
-Objective-C Code Generator Extension for StarUML 2
+Objective-C Code Generator Extension for StarUML 2.8.0 ( not supported in StarUML 3 )
 
 ============================
 
