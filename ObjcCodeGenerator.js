@@ -590,7 +590,7 @@ define(function (require, exports, module) {
                 continue;
             }
 
-            if (trackingHeader(elem, realize.target).substring(0,1) === "AB") {
+            if (trackingHeader(elem, realize.target).substring(0,1) === "MB") {
                 continue;
             }
 
@@ -609,6 +609,17 @@ define(function (require, exports, module) {
                 continue;
             }
             if (target === elem) {
+                continue;
+            }
+            if (trackingHeader(elem, target).substring(0,1) === "UI") {
+                continue;
+            }
+
+            if (trackingHeader(elem, target).substring(0,1) === "NS") {
+                continue;
+            }
+
+            if (trackingHeader(elem, target).substring(0,1) === "MB") {
                 continue;
             }
             headerString += "#import \"" + trackingHeader(elem, target) + ".h\"\n";
