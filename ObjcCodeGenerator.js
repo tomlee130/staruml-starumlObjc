@@ -125,18 +125,20 @@ define(function (require, exports, module) {
             for (i = 0; i < modifierList.length; i++) {
                 modifierStr += modifierList[i] + " ";
             }
-            var elems = _.pluck(elem.literals, 'name');
-            var documentation = _.pluck(elem.literals, 'documentation');
-            var members = ""
-            for (var i = 0; i < elems.length; i++) {
-                if (documentation[i].length > 0) {
-                    members += "\t" + elem.name + titleCase(elems[i]) + ", /* "+ documentation[i] + " */\n";
-                    continue;
-                }
+            
+            if (elem.documentation.length > 0) {
+                codeWriter.writeLine('/**\n' + " " + elem.documentation + '\n')
 
-                members += "\t" + elem.name + titleCase(elems[i]) + ",\n";
+                const litLength = elem.literals.length
+                for (let i = 0; i < litLength; i++) {
+                    codeWriter.writeLine(' - ' + elem.literals[i].name + ': ' + elem.literals[i].documentation)
+                }
+                codeWriter.writeLine(' */')
             }
-            codeWriter.writeLine(modifierStr + "typedef NS_ENUM(NSUInteger, " + elem.name + ") {\n" + members  + "};");
+
+            codeWriter.writeLine(modifierStr + 'typedef NS_ENUM(NSInteger, ' + elem.name +
+                ') {\n' + elem.literals.map(lit => indentString + elem.name + titleCase(lit.name)).join(',\t\n') + '\n};')
+        }
         };
 
         var date = new Date();
