@@ -137,9 +137,9 @@ define(function (require, exports, module) {
         var year = date.getFullYear();
         var month = date.getMonth() + 1;
         var day = date.getDate();
-        var hour = date.getHours();
-        var minute = date.getMinutes();
-        var second = date.getSeconds();
+        // var hour = date.getHours();
+        // var minute = date.getMinutes();
+        // var second = date.getSeconds();
             
         var writeClassHeader = function (codeWriter, elem, cppCodeGen, isPrivate) {
             var i;
@@ -252,7 +252,7 @@ define(function (require, exports, module) {
             if (elem.documentation.length > 0) {
                 brief = elem.documentation;
             }
-            var docs = '@brief  ' + brief + '\n\n@author: uml \n\n@version: ' + year + '年' + month + '月' + day + '日 ' + hour + ':' + minute + ':' + second + '\n';
+            var docs = '@brief  ' + brief + '\n\n@author: uml \n\n@date: ' + year + '-' + month + '-' + day + '日\n';
             codeWriter.writeLine(cppCodeGen.getDocuments(docs));
             if (elem instanceof type.UMLInterface) {
                 codeWriter.writeLine("@protocol " + elem.name + " <NSObject>");
