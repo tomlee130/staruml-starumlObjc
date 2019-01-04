@@ -125,15 +125,20 @@ define(function (require, exports, module) {
             for (i = 0; i < modifierList.length; i++) {
                 modifierStr += modifierList[i] + " ";
             }
+
+            if (elem.documentation.length > 0) {
+                codeWriter.writeLine('/**\n' + "@brief " + elem.documentation + '\n');
+
+                var litLength = elem.literals.length;
+                for (i = 0; i < litLength; i++) {
+                    codeWriter.writeLine(' - ' + elem.literals[i].name + ': ' + elem.literals[i].documentation);
+                }
+                codeWriter.writeLine(' */');
+            }
+
             var elems = _.pluck(elem.literals, 'name');
-            var documentation = _.pluck(elem.literals, 'documentation');
             var members = ""
             for (var i = 0; i < elems.length; i++) {
-                if (documentation[i].length > 0) {
-                    members += "\t" + elem.name + titleCase(elems[i]) + ", /* "+ documentation[i] + " */\n";
-                    continue;
-                }
-
                 members += "\t" + elem.name + titleCase(elems[i]) + ",\n";
             }
             codeWriter.writeLine(modifierStr + "typedef NS_ENUM(NSUInteger, " + elem.name + ") {\n" + members  + "};");
