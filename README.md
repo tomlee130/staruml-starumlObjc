@@ -21,9 +21,7 @@ This extension for StarUML(http://staruml.io) support to generate Objective-C co
 
 /**
  * @brief  SDK界面管理
- * 
  * @author: uml 
- * 
  * @date: 2019-1-4
  */
 
@@ -71,7 +69,6 @@ This extension for StarUML(http://staruml.io) support to generate Objective-C co
 ```
 
 ## eg. Gen Enum
-
 ```Objective-C
 /**
  * Project HTPlatform
@@ -82,7 +79,6 @@ This extension for StarUML(http://staruml.io) support to generate Objective-C co
 
 /**
 @brief 输入框类型
-
  - account: 账号输入框
  - register: 注册输入框
  - cellphone: 手机号码输入框
